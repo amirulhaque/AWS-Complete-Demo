@@ -10,7 +10,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/amirulhaque/AWS-Complete-Demo.git [github.com]'
+                git branch: 'main', url: 'https://github.com/amirulhaque/AWS-Complete-Demo.git'
             }
         }
 
@@ -30,7 +30,7 @@ pipeline {
                             rm -rf ${APP_DIR};
 
                             # Clone your real repo
-                            git clone https://github.com/amirulhaque/AWS-Complete-Demo.git [github.com] ${APP_DIR};
+                            git clone https://github.com/amirulhaque/AWS-Complete-Demo.git ${APP_DIR};
 
                             cd ${APP_DIR};
 
