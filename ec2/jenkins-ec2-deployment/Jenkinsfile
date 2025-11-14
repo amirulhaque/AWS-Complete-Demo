@@ -29,10 +29,11 @@ pipeline {
                             # Remove old deployment
                             rm -rf ${APP_DIR};
 
-                            # Clone your real repo
+                            # Clone your real repo into EC2
                             git clone https://github.com/amirulhaque/AWS-Complete-Demo.git ${APP_DIR};
 
-                            cd ${APP_DIR};
+                            # IMPORTANT: Navigate into the folder where app actually exists
+                            cd ${APP_DIR}/ec2/jenkins-ec2-deployment;
 
                             python3 -m venv venv;
                             source venv/bin/activate;
@@ -41,7 +42,7 @@ pipeline {
                             # Stop old app
                             pkill -f "python3 app.py" || true;
 
-                            # Start app
+                            # Start new app
                             nohup python3 app.py > app.log 2>&1 &
                         '
                     """
