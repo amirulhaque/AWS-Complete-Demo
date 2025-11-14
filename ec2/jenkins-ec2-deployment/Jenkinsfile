@@ -16,7 +16,7 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-user']) {
+                sshagent(['ec2-deploy-key']) {
                     sh """
                         echo "Deploying to EC2 at \$TARGET_IP ..."
 
