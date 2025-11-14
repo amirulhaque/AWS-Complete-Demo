@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     environment {
@@ -6,37 +7,44 @@ pipeline {
     }
 
     stages {
+
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/amirulhaque/AWS-Complete-Demo.git'
+                git branch: 'main', url: 'https://github.com/amirulhaque/AWS-Complete-Demo.git [github.com]'
             }
         }
 
         stage('Deploy to EC2') {
             steps {
                 sshagent(['ec2-deploy-key']) {
-                    sh '''
-                        echo "Deploying to EC2 at $TARGET_IP ..."
-                        ssh -o StrictHostKeyChecking=no ec2-user@$TARGET_IP '
-                            # install python if missing
+                    sh """
+                        echo "Deploying to EC2 at \$TARGET_IP ..."
+
+                        ssh -o StrictHostKeyChecking=no ec2-user@\$TARGET_IP '
+                            set -e
+
+                            # Install Python
                             command -v python3 >/dev/null 2>&1 || sudo yum install -y python3 || sudo apt-get install -y python3;
 
-                            # cleanup old deployment and clone latest code
-                            rm -rf $APP_DIR;
-                            git clone https://github.com/ [github.com]<your-username>/sample-python-app.git $APP_DIR;
+                            # Remove old deployment
+                            rm -rf ${APP_DIR};
 
-                            cd $APP_DIR;
+                            # Clone your real repo
+                            git clone https://github.com/amirulhaque/AWS-Complete-Demo.git [github.com] ${APP_DIR};
+
+                            cd ${APP_DIR};
+
                             python3 -m venv venv;
                             source venv/bin/activate;
                             pip install -r requirements.txt;
 
-                            # stop any existing app
+                            # Stop old app
                             pkill -f "python3 app.py" || true;
 
-                            # start app in background
+                            # Start app
                             nohup python3 app.py > app.log 2>&1 &
                         '
-                    '''
+                    """
                 }
             }
         }
@@ -44,7 +52,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Successfully deployed! Visit: http://$TARGET_IP:5000 [$target_ip]"
+            echo "✅ Successfully deployed! Visit: http://\$TARGET_IP:5000 [$target_ip]"
         }
         failure {
             echo "❌ Deployment failed. Check Jenkins console output."
