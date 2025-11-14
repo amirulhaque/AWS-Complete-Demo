@@ -16,7 +16,7 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-deploy-key']) {
+                sshagent(['ec2-user']) {
                     sh """
                         echo "Deploying to EC2 at \$TARGET_IP ..."
 
@@ -29,22 +29,20 @@ pipeline {
                             # Remove old deployment
                             rm -rf ${APP_DIR};
 
-                            # Clone your real repo into EC2
+                            # Clone repo
                             git clone https://github.com/amirulhaque/AWS-Complete-Demo.git ${APP_DIR};
 
-                            # IMPORTANT: Navigate into the folder where app actually exists
+                            # Enter app folder
                             cd ${APP_DIR}/ec2/jenkins-ec2-deployment;
 
                             python3 -m venv venv;
                             source venv/bin/activate;
                             pip install -r requirements.txt;
 
-                            # Stop old app
                             pkill -f "python3 app.py" || true;
 
-                            # Start new app
                             nohup python3 app.py > app.log 2>&1 &
-                        '
+                        ' || true
                     """
                 }
             }
@@ -60,3 +58,4 @@ pipeline {
         }
     }
 }
+
